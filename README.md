@@ -1,3 +1,3 @@
 # Interactive-Programming-in-Python
-Menory
+Menory 1
 http://www.codeskulptor.org/#examples-memory_template.py
