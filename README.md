@@ -1,3 +1,3 @@
 # Interactive-Programming-in-Python
-Exercises and mini projects for this course
+Menory
 http://www.codeskulptor.org/#examples-memory_template.py
