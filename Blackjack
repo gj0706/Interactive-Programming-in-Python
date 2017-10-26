@@ -55,29 +55,34 @@ class Hand:
         self.hand_list = []
         
     def __str__(self):
-        	# return a string representation of a hand
-	hand = ""
-	for i in range(len(self.hand_list)):
-	    hand += str(self.hand_list[i]) + " "
-	return "Hand contains " + hand 
-	
+            # return a string representation of a hand
+        hand = ""
+        for i in range(len(self.hand_list)):
+            hand += str(self.hand_list[i]) + " "
+        return "Hand contains " + hand 
+    
     def add_card(self, card):
         return self.hand_list.append(card) 	# add a card object to a hand
 
-    def get_value(self, hand_value):
+    def get_value(self):
         # count aces as 1, if the hand has an ace, then add 10 to hand value if it doesn't bust
         # compute the value of the hand, see Blackjack video
-        for key in VALUES:
-            for key in str(range(2, 10)):
-                hand_value += VALUES[key]
-            if  key == "T" or key == "J" or key == "Q" or key == "K":
-                hand_value += 10
-            elif key == "A":
-                if self.card.get_rank()
-        pass
+        hand_value = 0
+        has_ace = False
+        for card in self.hand_list:
+            hand_value += VALUES[card.get_rank()]
+            if card.get_rank() == "A": 
+                has_ace = True
+        if hand_value + 10 <= 21 and has_ace == True:
+            hand_value += 10
+  
+        return hand_value
+                                       
     def draw(self, canvas, pos):
-        pass	# draw a hand on the canvas, use the draw method for cards
- 
+        # draw a hand on the canvas, use the draw method for cards
+        for card in self.hand_list:
+            card.draw(canvas, pos)
+            pos[0] += 80
         
 # define deck class 
 class Deck:
@@ -86,9 +91,9 @@ class Deck:
         self.deck_list = []
         for suit in SUITS:
             for rank in RANKS:
-	    	card = Card(suit, rank)
-                self.deck_list.append(card)
-                
+                card = Card(suit, rank)
+                self.deck_list.append(card)              
+
     def shuffle(self):
         # shuffle the deck 
         # use random.shuffle()
@@ -103,33 +108,56 @@ class Deck:
         deck = ""
         for i in range(len(self.deck_list)):
             deck += str(self.deck_list[i]) + " "
-        return "Deck contains " + deck 
+        return "Deck contains "  + deck  
 
 
 #define event handlers for buttons
 def deal():
     global outcome, in_play, deck, player, dealer
-	deck = Deck()
-    deck.deck_shuffle()
+    
+    deck = Deck()
     player = Hand()
     dealer = Hand()
+    deck.shuffle()
+
     player.add_card(deck.deal_card())
     player.add_card(deck.deal_card())
     dealer.add_card(deck.deal_card())
     dealer.add_card(deck.deal_card())
+
+    in_play = True
 
 def hit():
-    pass	# replace with your code below
- 
+    global in_play, deck, player, dealer, score
     # if the hand is in play, hit the player
-   
-    # if busted, assign a message to outcome, update in_play and score
+    if in_play == True:
+        if player.get_value() <= 21:
+            player.add_card(deck.deal_card())
+    # if busted, assign a message to outcome, update in_play and
+        elif player.get_value() > 21:            
+            print "You have busted."
+            in_play = False
+            score -= 1
        
 def stand():
-    pass	# replace with your code below
-   
+    global in_play, deck, player, dealer
+    while in_play == True:
+        if dealer.get_value() < 17:
+            dealer.add_card(deck.deal_card())
+        elif dealer.get_value() > 21:
+            print "Dealer has busted, you win!"
+            in_play = False
+        elif dealer.get_value() >= player.get_value():
+                print "You lose!"
+                in_play = False
+        elif dealer.get_value() < player.get_value():
+                print "You win!"
+                in_play = False
+            
+            
+        
     # if hand is in play, repeatedly hit dealer until his hand has value 17 or more
-
+    
     # assign a message to outcome, update in_play and score
 
 # draw handler    
