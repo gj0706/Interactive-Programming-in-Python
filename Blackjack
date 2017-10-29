@@ -113,7 +113,7 @@ class Deck:
 
 #define event handlers for buttons
 def deal():
-    global outcome, in_play, deck, player, dealer
+    global outcome, in_play, deck, player, dealer, score
     
     deck = Deck()
     player = Hand()
@@ -124,38 +124,45 @@ def deal():
     player.add_card(deck.deal_card())
     dealer.add_card(deck.deal_card())
     dealer.add_card(deck.deal_card())
-
     in_play = True
 
+    if in_play == True:
+        
+        outcome = "Hit or stand?"
+    else:
+        outcome = "New deal?"
+        score -= 1
+        
 def hit():
-    global in_play, deck, player, dealer, score
+    global in_play, deck, player, dealer, score, outcome
     # if the hand is in play, hit the player
     if in_play == True:
         if player.get_value() <= 21:
             player.add_card(deck.deal_card())
     # if busted, assign a message to outcome, update in_play and
-        elif player.get_value() > 21:            
-            print "You have busted."
+        elif player.get_value() > 21: 
+            outcome = "You have busted. Try again? "
             in_play = False
             score -= 1
        
 def stand():
-    global in_play, deck, player, dealer
+    global in_play, deck, player, dealer, outcome, score, outcome
     while in_play == True:
         if dealer.get_value() < 17:
             dealer.add_card(deck.deal_card())
         elif dealer.get_value() > 21:
-            print "Dealer has busted, you win!"
+            outcome = "Dealer has busted, you win!"
+            score += 1
             in_play = False
         elif dealer.get_value() >= player.get_value():
-                print "You lose!"
-                in_play = False
+            outcome = "You lose! One more time?"
+            score -= 1
+            in_play = False
         elif dealer.get_value() < player.get_value():
-                print "You win!"
-                in_play = False
-            
-            
-        
+            outcome = "Bravo! You win! Play again?"
+            score += 1
+            in_play = False
+                 
     # if hand is in play, repeatedly hit dealer until his hand has value 17 or more
     
     # assign a message to outcome, update in_play and score
@@ -163,11 +170,13 @@ def stand():
 # draw handler    
 def draw(canvas):
     # test to make sure that card.draw works, replace with your code below
+    global in_play
+    canvas.draw_text(outcome, [300, 280], 20, "White")
+    canvas.draw_text("Blackjack", [250, 25], 30, "Black")
+    canvas.draw_text("Score = " + str(score), [300, 200], 20, "Red")
+    player.draw(canvas, [50, 300])
+    dealer.draw(canvas, [50, 150])
     
-    card = Card("S", "A")
-    card.draw(canvas, [300, 300])
-
-
 # initialization frame
 frame = simplegui.create_frame("Blackjack", 600, 600)
 frame.set_canvas_background("Green")
