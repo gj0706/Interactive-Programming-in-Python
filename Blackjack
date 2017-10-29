@@ -1,4 +1,5 @@
 # Mini-project #6 - Blackjack
+# URL: http://www.codeskulptor.org/#user43_gtYsnsTgIc_2.py
 
 import simplegui
 import random
@@ -204,4 +205,3 @@ deal()
 frame.start()
 
 
-# remember to review the gradic rubric
