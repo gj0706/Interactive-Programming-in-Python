@@ -137,10 +137,10 @@ def hit():
         if player.get_value() <= 21:
             player.add_card(deck.deal_card())
     # if busted, assign a message to outcome, update in_play and
-        elif player.get_value() > 21: 
-            outcome = "You have busted. Try again? "
-            in_play = False
-            score -= 1
+            if player.get_value() > 21: 
+                outcome = "You have busted. Try again? "
+                in_play = False
+                score -= 1
        
 def stand():
     global in_play, deck, player, dealer, outcome, score, outcome
