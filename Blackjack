@@ -1,5 +1,4 @@
 # Mini-project #6 - Blackjack
-# URL: http://www.codeskulptor.org/#user43_gtYsnsTgIc_0.py
 
 import simplegui
 import random
@@ -76,6 +75,7 @@ class Hand:
                 has_ace = True
         if hand_value + 10 <= 21 and has_ace == True:
             hand_value += 10
+  
         return hand_value
                                        
     def draw(self, canvas, pos):
@@ -110,27 +110,25 @@ class Deck:
             deck += str(self.deck_list[i]) + " "
         return "Deck contains "  + deck  
 
+
 #define event handlers for buttons
 def deal():
     global outcome, in_play, deck, player, dealer, score
-    
-    deck = Deck()
-    player = Hand()
-    dealer = Hand()
-    deck.shuffle()
-
-    player.add_card(deck.deal_card())
-    player.add_card(deck.deal_card())
-    dealer.add_card(deck.deal_card())
-    dealer.add_card(deck.deal_card())
-    in_play = True
-
     if in_play == True:
-        
-        outcome = "Hit or stand?"
-    else:
-        outcome = "New deal?"
         score -= 1
+        in_play = False
+        outcome = "You give up. New deal?"
+    else:
+        deck = Deck()
+        player = Hand()
+        dealer = Hand()
+        deck.shuffle()
+        player.add_card(deck.deal_card())
+        player.add_card(deck.deal_card())
+        dealer.add_card(deck.deal_card())
+        dealer.add_card(deck.deal_card())
+        outcome = "Hit or stand?"
+        in_play = True
         
 def hit():
     global in_play, deck, player, dealer, score, outcome
@@ -147,9 +145,8 @@ def hit():
 def stand():
     global in_play, deck, player, dealer, outcome, score, outcome
     
-   # if hand is in play, repeatedly hit dealer until his hand has value 17 or more
-   # assign a message to outcome, update in_play and score
     while in_play == True:
+    
         if dealer.get_value() < 17:
             dealer.add_card(deck.deal_card())
         elif dealer.get_value() > 21:
@@ -173,6 +170,10 @@ def stand():
             score -=1
             in_play = False
                  
+    # if hand is in play, repeatedly hit dealer until his hand has value 17 or more
+    
+    # assign a message to outcome, update in_play and score
+
 # draw handler    
 def draw(canvas):
     # test to make sure that card.draw works, replace with your code below
@@ -197,8 +198,10 @@ frame.add_button("Hit",  hit, 200)
 frame.add_button("Stand", stand, 200)
 frame.set_draw_handler(draw)
 
+
 # get things rolling
 deal()
 frame.start()
 
 
+# remember to review the gradic rubric
