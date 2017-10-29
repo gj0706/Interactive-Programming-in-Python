@@ -1,4 +1,5 @@
 # Mini-project #6 - Blackjack
+# URL: http://www.codeskulptor.org/#user43_gtYsnsTgIc_0.py
 
 import simplegui
 import random
@@ -75,14 +76,13 @@ class Hand:
                 has_ace = True
         if hand_value + 10 <= 21 and has_ace == True:
             hand_value += 10
-  
         return hand_value
                                        
     def draw(self, canvas, pos):
         # draw a hand on the canvas, use the draw method for cards
         for card in self.hand_list:
             card.draw(canvas, pos)
-            pos[0] += 80
+            pos[0] += 90
         
 # define deck class 
 class Deck:
@@ -109,7 +109,6 @@ class Deck:
         for i in range(len(self.deck_list)):
             deck += str(self.deck_list[i]) + " "
         return "Deck contains "  + deck  
-
 
 #define event handlers for buttons
 def deal():
@@ -147,6 +146,9 @@ def hit():
        
 def stand():
     global in_play, deck, player, dealer, outcome, score, outcome
+    
+   # if hand is in play, repeatedly hit dealer until his hand has value 17 or more
+   # assign a message to outcome, update in_play and score
     while in_play == True:
         if dealer.get_value() < 17:
             dealer.add_card(deck.deal_card())
@@ -158,24 +160,32 @@ def stand():
             outcome = "You lose! One more time?"
             score -= 1
             in_play = False
-        elif dealer.get_value() < player.get_value():
+        elif dealer.get_value() < player.get_value(): 
             outcome = "Bravo! You win! Play again?"
             score += 1
             in_play = False
+        else:
+            outcome = "You lose! One more time?"
+            score -=1
+            in_play = False
+        if player.get_value() > 21:
+            outcome = "You have busted. Try again?"
+            score -=1
+            in_play = False
                  
-    # if hand is in play, repeatedly hit dealer until his hand has value 17 or more
-    
-    # assign a message to outcome, update in_play and score
-
 # draw handler    
 def draw(canvas):
     # test to make sure that card.draw works, replace with your code below
     global in_play
-    canvas.draw_text(outcome, [300, 280], 20, "White")
-    canvas.draw_text("Blackjack", [250, 25], 30, "Black")
-    canvas.draw_text("Score = " + str(score), [300, 200], 20, "Red")
-    player.draw(canvas, [50, 300])
-    dealer.draw(canvas, [50, 150])
+    canvas.draw_text(outcome, [300, 300], 20, "White")
+    canvas.draw_text("Blackjack", [250, 50], 30, "Black")
+    canvas.draw_text("Score = " + str(score), [300, 140], 20, "White")
+    canvas.draw_text("Dearler", [40, 140], 20, "Yellow")
+    canvas.draw_text("Player", [40, 300], 20, "Yellow")
+    dealer.draw(canvas, [40, 170])
+    player.draw(canvas, [40, 330])
+    if in_play == True:
+        canvas.draw_image(card_back, CARD_BACK_CENTER, CARD_BACK_SIZE, [(CARD_BACK_CENTER[0] + 130), (CARD_BACK_CENTER[1] + 170)], CARD_BACK_SIZE )
     
 # initialization frame
 frame = simplegui.create_frame("Blackjack", 600, 600)
@@ -187,10 +197,8 @@ frame.add_button("Hit",  hit, 200)
 frame.add_button("Stand", stand, 200)
 frame.set_draw_handler(draw)
 
-
 # get things rolling
 deal()
 frame.start()
 
 
-# remember to review the gradic rubric
