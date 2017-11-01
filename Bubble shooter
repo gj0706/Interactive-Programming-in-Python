@@ -30,13 +30,13 @@ def dist(p,q):
 # class defintion for Bubbles
 class Bubble:
     
-    def __init__(self):
+    def __init__(self, sound = None): # 加声音参数， optional
         # make sure self.pos instance is a list
         # 如果不加list，执行结果是发射器跟小球一起射出
         self.pos = list(FIRING_POSITION) 
         self.vel = [0, 0] # 不是 0 而是一个list
         self.color = random.choice(COLOR_LIST)
-    
+        self.sound = sound
     def update(self):
         self.pos[0] += self.vel[0]
         self.pos[1] += self.vel[1]
@@ -45,7 +45,8 @@ class Bubble:
         
     def fire_bubble(self, vel):
         self.vel = vel
-        
+        if self.sound:
+            self.sound.play()
     def is_stuck(self): 
         pass
 
@@ -70,14 +71,15 @@ def keydown(key):
         #小球的速度可以是发射器转动的速度，也可以是它的倍数
         bubble_vel = angle_to_vector(firing_angle)
         #小球向上射出，所以y轴速度为负
-        a_bubble.fire_bubble([15 * bubble_vel[0], -15 * bubble_vel[1]])
+        a_bubble.fire_bubble([30 * bubble_vel[0], -30 * bubble_vel[1]])
      
         
 def keyup(key):
     global firing_angle_vel
     if key == simplegui.KEY_MAP["right"] or key == simplegui.KEY_MAP["left"]:
         firing_angle_vel = 0
-   
+
+
 # define draw handler
 def draw(canvas):
     global firing_angle, a_bubble, bubble_stuck
@@ -101,7 +103,8 @@ frame = simplegui.create_frame("Bubble Shooter", WIDTH, HEIGHT)
 frame.set_keydown_handler(keydown)
 frame.set_keyup_handler(keyup)
 frame.set_draw_handler(draw)
-
+# create a sound when firing a bubble
+fire_sound = simplegui.load_sound("http://commondatastorage.googleapis.com/codeskulptor-assets/Collision8-Bit.ogg")
 # create initial buble and start frame
-a_bubble = Bubble()
+a_bubble = Bubble(fire_sound)
 frame.start()
