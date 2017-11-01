@@ -31,13 +31,20 @@ def dist(p,q):
 class Bubble:
     
     def __init__(self):
-        pass
+        # make sure self.pos instance is a list
+        # 如果不加list，执行结果是发射器跟小球一起射出
+        self.pos = list(FIRING_POSITION) 
+        self.vel = [0, 0] # 不是 0 而是一个list
+        self.color = random.choice(COLOR_LIST)
     
     def update(self):
-        pass
+        self.pos[0] += self.vel[0]
+        self.pos[1] += self.vel[1]
+        if self.pos[0] + BUBBLE_RADIUS >= WIDTH or self.pos[0] <= BUBBLE_RADIUS:
+            self.vel = - self.vel
         
     def fire_bubble(self, vel):
-        pass
+        self.vel = vel
         
     def is_stuck(self): 
         pass
@@ -46,7 +53,7 @@ class Bubble:
         pass
             
     def draw(self, canvas):
-        pass
+        canvas.draw_circle(self.pos, BUBBLE_RADIUS, 2, self.color, self.color)
         
 
 # define keyhandlers to control firing_angle
@@ -56,28 +63,39 @@ def keydown(key):
         firing_angle_vel -= FIRING_ANGLE_VEL_INC
     elif key == simplegui.KEY_MAP["left"]:
         firing_angle_vel += FIRING_ANGLE_VEL_INC
-
+    elif key == simplegui.KEY_MAP["space"]:
+        bubble_stuck = False # 小球没有被卡住，也就是开火
+        #把发射角度转换成x轴和y轴向量，把小球的速度方向与之匹配
+        #使小球射出的方向跟发射的角度一致
+        #小球的速度可以是发射器转动的速度，也可以是它的倍数
+        bubble_vel = angle_to_vector(firing_angle)
+        #小球向上射出，所以y轴速度为负
+        a_bubble.fire_bubble([15 * bubble_vel[0], -15 * bubble_vel[1]])
+     
+        
 def keyup(key):
     global firing_angle_vel
     if key == simplegui.KEY_MAP["right"] or key == simplegui.KEY_MAP["left"]:
         firing_angle_vel = 0
-    
+   
 # define draw handler
 def draw(canvas):
-    global firing_angle, a_bubble, bubble_stuck, firing_angle_vel
-    
+    global firing_angle, a_bubble, bubble_stuck
+
     # update firing angle
     firing_angle += firing_angle_vel
-   
     
     # draw firing line
-    upperend_point_vector = [angle_to_vector(firing_angle)[0] * FIRING_LINE_LENGTH, angle_to_vector(firing_angle)[1] * FIRING_LINE_LENGTH]
-    upperend_point_pos = [upperend_point_vector[0] + FIRING_POSITION[0], FIRING_POSITION[1] - upperend_point_vector[1]]
+    upperend_point_vector = [angle_to_vector(firing_angle)[0] * FIRING_LINE_LENGTH, 
+                             angle_to_vector(firing_angle)[1] * FIRING_LINE_LENGTH]
+    upperend_point_pos = [upperend_point_vector[0] + FIRING_POSITION[0], 
+                          FIRING_POSITION[1] - upperend_point_vector[1]]
     canvas.draw_line(FIRING_POSITION, upperend_point_pos, 2, "Yellow")
     # update a_bubble and check for sticking
-    
+    a_bubble.update()
     # draw a bubble and stuck bubbles
- 
+    a_bubble.draw(canvas)
+    
 # create frame and register handlers
 frame = simplegui.create_frame("Bubble Shooter", WIDTH, HEIGHT)
 frame.set_keydown_handler(keydown)
@@ -85,4 +103,5 @@ frame.set_keyup_handler(keyup)
 frame.set_draw_handler(draw)
 
 # create initial buble and start frame
+a_bubble = Bubble()
 frame.start()
