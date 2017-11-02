@@ -148,11 +148,17 @@ class Sprite:
             sound.rewind()
             sound.play()
    
-    def draw(self, canvas):
-        canvas.draw_circle(self.pos, self.radius, 1, "Red", "Red")
+   def draw(self, canvas):
+        canvas.draw_image(asteroid_image, self.image_center, self.image_size,
+                          self.pos, self.image_size, self.angle)
     
     def update(self):
-        pass      
+        # angle update
+        self.angle += self.angle_vel
+        # position update: the rock moves and wraps around the screen
+        self.pos[0] = (self.pos[0] + self.vel[0]) % WIDTH 
+        self.pos[1] = (self.pos[1] + self.vel[1]) % HEIGHT
+              
     
 def keydown(key):
     if key == simplegui.KEY_MAP["right"]:
