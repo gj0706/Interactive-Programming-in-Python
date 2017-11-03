@@ -1,4 +1,4 @@
-# program template for Spaceship
+# Game Spaceship
 import simplegui
 import math
 import random
@@ -6,14 +6,13 @@ import random
 # global constants
 WIDTH = 800
 HEIGHT = 600
-ANGLE_VEL_INC = 0.03
+ANGLE_VEL_INC = 0.1
+C = 0.3
 
 # global variables
 score = 0
 lives = 3
 time = 0
-ship_angle = math.pi / 2
-ship_angle_vel = 0
 
 class ImageInfo:
     def __init__(self, center, size, radius = 0, lifespan = None, animated = False):
@@ -40,8 +39,7 @@ class ImageInfo:
 
     def get_animated(self):
         return self.animated
-
-    
+   
 # art assets created by Kim Lathrop, may be freely re-used in non-commercial projects, please credit Kim
     
 # debris images - debris1_brown.png, debris2_brown.png, debris3_brown.png, debris4_brown.png
@@ -91,10 +89,9 @@ def angle_to_vector(ang):
 def dist(p,q):
     return math.sqrt((p[0] - q[0]) ** 2+(p[1] - q[1]) ** 2)
 
-
 # Ship class
 class Ship:
-    def __init__(self, pos, vel, angle, image, info):
+    def __init__(self, pos, vel, angle, image, info, sound = None):
         self.pos = [pos[0],pos[1]]
         self.vel = [vel[0],vel[1]]
         self.thrust = False
@@ -104,19 +101,29 @@ class Ship:
         self.image_center = info.get_center()
         self.image_size = info.get_size()
         self.radius = info.get_radius()
-        
+        self.sound = sound
+            
     def draw(self,canvas): 
         if self.thrust:
-            canvas.draw_image(ship_image, [self.image_center[0] + self.image_size[0], self.image_center[1]],
-                            self.image_size, self.pos, self.image_size, self.angle)
+            canvas.draw_image(ship_image, [self.image_center[0] + self.image_size[0], self.image_center[1]], self.image_size, 
+                          self.pos, self.image_size, self.angle)
         else:
             canvas.draw_image(ship_image, self.image_center, self.image_size, 
                           self.pos, self.image_size, self.angle)
             
     def update(self):
-        self.pos[0] += self.vel[0]
-        self.pos[1] += self.vel[1]
+        # position, velocity update: the ship's motion wraps around the screen
+        self.pos[0] = (self.pos[0] + self.vel[0]) % WIDTH 
+        self.pos[1] = (self.pos[1] + self.vel[1]) % HEIGHT
+        # ship's angle update
         self.angle += self.angle_vel
+        # thrust update: make the ship accelerate forward when thrust
+        if self.thrust:
+            self.vel[0] += angle_to_vector(self.angle)[0]
+            self.vel[1] += angle_to_vector(self.angle)[1]
+        # friction update
+            self.vel[0] *= 1 - C
+            self.vel[1] *= 1 - C
         
     def angle_vel_inc(self, inc):
         self.angle_vel += inc
@@ -126,10 +133,14 @@ class Ship:
     
     def thruster_on(self):
         self.thrust = True
+        if self.sound:
+            self.sound.play()
     
     def thruster_off(self):
         self.thrust = False
-    
+        if self.sound:
+            self.sound.rewind()
+              
 # Sprite class
 class Sprite:
     def __init__(self, pos, vel, ang, ang_vel, image, info, sound = None):
@@ -148,7 +159,7 @@ class Sprite:
             sound.rewind()
             sound.play()
    
-   def draw(self, canvas):
+    def draw(self, canvas):
         canvas.draw_image(asteroid_image, self.image_center, self.image_size,
                           self.pos, self.image_size, self.angle)
     
@@ -157,19 +168,18 @@ class Sprite:
         self.angle += self.angle_vel
         # position update: the rock moves and wraps around the screen
         self.pos[0] = (self.pos[0] + self.vel[0]) % WIDTH 
-        self.pos[1] = (self.pos[1] + self.vel[1]) % HEIGHT
-              
-    
-def keydown(key):
+        self.pos[1] = (self.pos[1] + self.vel[1]) % HEIGHT      
+        
+def keydown(key): 
     if key == simplegui.KEY_MAP["right"]:
         my_ship.angle_vel_inc(ANGLE_VEL_INC) 
     elif key == simplegui.KEY_MAP["left"]:
         my_ship.angle_vel_dec(ANGLE_VEL_INC) 
     elif key == simplegui.KEY_MAP["up"]:
         my_ship.thruster_on()
-             
+                
 def keyup(key):
-   if key == simplegui.KEY_MAP["right"]:
+    if key == simplegui.KEY_MAP["right"]:
         my_ship.angle_vel_dec(ANGLE_VEL_INC)
     elif key == simplegui.KEY_MAP["left"]:
         my_ship.angle_vel_inc(ANGLE_VEL_INC)    
@@ -200,14 +210,18 @@ def draw(canvas):
             
 # timer handler that spawns a rock    
 def rock_spawner():
-    pass
+    global a_rock
+    rock_pos = [random.randrange(0, WIDTH), random.randrange(0, HEIGHT)]
+    rock_vel = [random.randrange(0, 3), random.randrange(0, 3)]
+    rock_angle = math.pi / random.randrange(1, 3)
+    rock_angle_vel = random.randrange(-2, 2)
+    a_rock = Sprite(rock_pos, rock_vel, rock_angle, rock_angle_vel, asteroid_image, asteroid_info)
     
 # initialize frame
 frame = simplegui.create_frame("Asteroids", WIDTH, HEIGHT)
 
 # initialize ship and two sprites
-my_ship = Ship([WIDTH / 2, HEIGHT / 2], [0, 0], 0, ship_image, ship_info)
-ship_with_thruster = Ship([WIDTH / 2, HEIGHT / 2], [0, 0], 0, ship_image, ship_info)
+my_ship = Ship([WIDTH / 2, HEIGHT / 2], [0, 0], 0, ship_image, ship_info, ship_thrust_sound)
 a_rock = Sprite([WIDTH / 3, HEIGHT / 3], [1, 1], 0, 0, asteroid_image, asteroid_info)
 a_missile = Sprite([2 * WIDTH / 3, 2 * HEIGHT / 3], [-1,1], 0, 0, missile_image, missile_info, missile_sound)
 
