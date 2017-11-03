@@ -1,4 +1,4 @@
-# Game Spaceship
+# program template for Spaceship
 import simplegui
 import math
 import random
@@ -7,12 +7,14 @@ import random
 WIDTH = 800
 HEIGHT = 600
 ANGLE_VEL_INC = 0.1
-C = 0.3
+C = 0.1
 
 # global variables
 score = 0
 lives = 3
 time = 0
+
+
 
 class ImageInfo:
     def __init__(self, center, size, radius = 0, lifespan = None, animated = False):
@@ -39,7 +41,8 @@ class ImageInfo:
 
     def get_animated(self):
         return self.animated
-   
+
+    
 # art assets created by Kim Lathrop, may be freely re-used in non-commercial projects, please credit Kim
     
 # debris images - debris1_brown.png, debris2_brown.png, debris3_brown.png, debris4_brown.png
@@ -89,6 +92,7 @@ def angle_to_vector(ang):
 def dist(p,q):
     return math.sqrt((p[0] - q[0]) ** 2+(p[1] - q[1]) ** 2)
 
+
 # Ship class
 class Ship:
     def __init__(self, pos, vel, angle, image, info, sound = None):
@@ -117,14 +121,16 @@ class Ship:
         self.pos[1] = (self.pos[1] + self.vel[1]) % HEIGHT
         # ship's angle update
         self.angle += self.angle_vel
+        
+        # friction update
+        self.vel[0] *= 1 - C
+        self.vel[1] *= 1 - C
+        
         # thrust update: make the ship accelerate forward when thrust
-        if self.thrust:
+        if self.thrust: 
             self.vel[0] += angle_to_vector(self.angle)[0]
             self.vel[1] += angle_to_vector(self.angle)[1]
-        # friction update
-            self.vel[0] *= 1 - C
-            self.vel[1] *= 1 - C
-        
+       
     def angle_vel_inc(self, inc):
         self.angle_vel += inc
         
@@ -146,11 +152,11 @@ class Ship:
         forward = angle_to_vector(self.angle)
         missile_pos = [self.pos[0] + self.radius * forward[0],
                       self.pos[1] + self.radius * forward[1]]
-        missile_vel = [self.vel[0] + 5 * forward[0], 
-                       self.vel[1] + 5 * forward[1]
-        a_missile = Sprite(missile_pos, missile_vel, 0 , 0, missile_image, missile_info, missile_sound)
-                
-              
+        missile_vel = [self.vel[0] + 10 * forward[0], 
+                       self.vel[1] + 10 * forward[1]]      
+        a_missile = Sprite(missile_pos, missile_vel, 0 , 0, 
+                           missile_image, missile_info, missile_sound)
+
 # Sprite class
 class Sprite:
     def __init__(self, pos, vel, ang, ang_vel, image, info, sound = None):
@@ -170,7 +176,7 @@ class Sprite:
             sound.play()
    
     def draw(self, canvas):
-        canvas.draw_image(asteroid_image, self.image_center, self.image_size,
+        canvas.draw_image(self.image, self.image_center, self.image_size,
                           self.pos, self.image_size, self.angle)
     
     def update(self):
@@ -189,7 +195,7 @@ def keydown(key):
         my_ship.thruster_on()
     elif key == simplegui.KEY_MAP["space"]:
         my_ship.shoot()
-                
+                       
 def keyup(key):
     if key == simplegui.KEY_MAP["right"]:
         my_ship.angle_vel_dec(ANGLE_VEL_INC)
@@ -238,7 +244,7 @@ frame = simplegui.create_frame("Asteroids", WIDTH, HEIGHT)
 # initialize ship and two sprites
 my_ship = Ship([WIDTH / 2, HEIGHT / 2], [0, 0], 0, ship_image, ship_info, ship_thrust_sound)
 a_rock = Sprite([WIDTH / 3, HEIGHT / 3], [1, 1], 0, 0, asteroid_image, asteroid_info)
-a_missile = Sprite([2 * WIDTH / 3, 2 * HEIGHT / 3], [-1,1], 0, 0, missile_image, missile_info, missile_sound)
+a_missile = Sprite([2* WIDTH / 3, 2 * HEIGHT / 3], [-1,1], 0, 0, missile_image, missile_info, missile_sound)
 
 # register handlers
 frame.set_draw_handler(draw)
