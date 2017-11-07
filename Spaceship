@@ -226,6 +226,8 @@ class Sprite:
         self.age += 1
         if self.age >= self.lifespan:
             return True
+        else:
+            return False
     
     def collide(self, other_object):
         other_object_pos = other_object.get_position()
@@ -334,6 +336,8 @@ def group_collide(group, other_object):
         if sprite.collide(other_object):
             group.remove(sprite)
             return True
+        else:
+            return False
         
 # check if missiles and rocks collide         
 def group_group_collide(group1, group2):
