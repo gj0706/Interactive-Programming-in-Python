@@ -2,7 +2,11 @@
 
 Mini project #7 Spaceship
 
-http://www.codeskulptor.org/#user43_JqnFt8iZKe_5.py
+Spaceship1
 
 http://www.codeskulptor.org/#user43_JqnFt8iZKe_6.py
+
+Spaceship2
+
+http://www.codeskulptor.org/#user43_JqnFt8iZKe_7.py
 
