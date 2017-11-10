@@ -10,3 +10,4 @@ This is a simple pong game, two players needed.
 2. The ball is spawned automatically with random speed
 3. Move the paddles to block the ball
 4. Failing to blcok the ball results loss of 1 score
+5. Hit "Reset" to restart the game.
